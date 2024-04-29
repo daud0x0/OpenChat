@@ -1,0 +1,130 @@
+<!-- chat_with_character.html -->
+
+{% extends 'chat/layout.html' %}
+
+{% block title %}
+Chat with {{ character.name }}
+{% endblock %}
+
+{% block head %}
+<style>
+  /* Add custom styles here */
+  .chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .chat-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 10px;
+  }
+
+  .typing-indicator {
+    animation: typing-indicator 1s infinite;
+  }
+
+  @keyframes typing-indicator {
+    0% { opacity: 0; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+  <h1 class="my-4">Chat with {{ character.name }}</h1>
+
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card mb-4">
+        <img src="{{ character.image.url }}" class="card-img-top" alt="{{ character.name }}">
+        <div class="card-body">
+          <h2 class="card-title">{{ character.name }}</h2>
+          <p class="card-text">{{ character.description }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat container -->
+    <div class="col-md-8">
+      <div class="chat-container">
+        <div class="chat-messages" id="chat-messages">
+          <!-- Chat messages will be displayed here -->
+        </div>
+
+        <!-- Input form for sending messages -->
+        <div class="input-group mt-3">
+          <input type="text" class="form-control" placeholder="Type your message..." id="message-input">
+          <div class="input-group-append">
+            <button class="btn btn-primary" type="button" id="send-btn">Send</button>
+          </div>
+        </div>
+
+        <!-- Loading spinner -->
+        <div id="loading-spinner" class="spinner-border text-primary" role="status" style="display: none;">
+          <span class="sr-only">Loading...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+  const url = window.location.href
+  const sendBtn = document.getElementById('send-btn');
+  const messageInput = document.getElementById('message-input');
+  const chatMessages = document.getElementById('chat-messages');
+
+  sendBtn.addEventListener('click', (e) => {
+    const message = messageInput.value.trim();
+
+    // Show loading spinner
+    document.getElementById('loading-spinner').style.display = 'inline-block';
+
+    // Show typing indicator
+    const typingIndicator = document.createElement('div');
+    typingIndicator.textContent = '{{ character.name }} is typing...';
+    typingIndicator.classList.add('typing-indicator');
+    chatMessages.appendChild(typingIndicator);
+
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({'message': message})
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json(); // Assuming response is JSON
+      })
+      .then(data => {
+        // Remove typing indicator
+        chatMessages.removeChild(typingIndicator);
+
+        const responseMessage = data['message'];
+        const messageElement = document.createElement('div');
+        messageElement.innerHTML = `<strong>You:</strong> ${message}<br><strong>{{ character.name }}:</strong> ${responseMessage}`;
+        chatMessages.appendChild(messageElement);
+        messageInput.value = '';  // Clear input field
+        chatMessages.scrollTop = chatMessages.scrollHeight;  // Scroll to bottom
+
+        // Hide loading spinner
+        document.getElementById('loading-spinner').style.display = 'none';
+      })
+      .catch(error => {
+        console.error('Error sending data:', error);
+
+        // Hide loading spinner on error
+        document.getElementById('loading-spinner').style.display = 'none';
+      });
+  });
+</script>
+{% endblock %}
+
