@@ -46,5 +46,26 @@
         {% endif %}
       {% endfor %}
     </div>
+
+    <h1 class="my-4">Chat with your favorite activists.</h1>
+    <div class="row">
+      {% for character in characters %}
+        {% if character.category.slug == 'activist' %}
+          <div class="col-md-4 mb-4">
+            <div class="card h-100">
+              <img src="{{ character.image.url }}" class="card-img-top" alt="{{ character.name }}">
+              <div class="card-body">
+                <h2 class="card-title">{{ character.name }}</h2>
+                <p class="card-text">{{ character.description }}</p>
+              </div>
+              <div class="card-footer">
+                <a href="{% url 'chat_with_character' category_slug=character.category.slug character_slug=character.slug %}" class="btn btn-primary">Chat</a>
+
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
   </div>
 {% endblock %}
