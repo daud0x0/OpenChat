@@ -16,14 +16,12 @@ from .models import Character, Category
 # Create your views here.
 
 genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
-model = genai.GenerativeModel('gemini-pro')
+model = genai.GenerativeModel('gemini-1.5-pro-latest')
 
 
 def search(request):
     query = request.GET.get('q', '')
-    print(query)
     characters = Character.objects.filter().filter(Q(description__icontains=query))
-    print(characters)
 
     return render(request, 'chat/search.html', {
         'query': query,
@@ -37,18 +35,6 @@ def home(request):
     return render(request, 'chat/home.html',{
         "characters":Character.objects.all()
     })
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse
-
-
-import google.generativeai as genai
-import os
-
-
-
-from .models import Character, Category
 
 # Create your views here.
 
