@@ -30,6 +30,11 @@ ALLOWED_HOSTS = ['*']
 
 APPEND_SLASH=False
 
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'images/static')  # where I want to host the static files i.e img, js & css
+]
+
 
 # Application definition
 
