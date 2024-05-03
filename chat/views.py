@@ -3,22 +3,27 @@ from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.db.models import Q
+from .models import Character, Category
 import json
-
-
 import google.generativeai as genai
 import os
 
 
-
-from .models import Character, Category
-
-# Create your views here.
+# configure google api key
 
 genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
-model = genai.GenerativeModel('gemini-1.5-pro-latest')
 
+# home page views
+def home(request):
+    return render(request, 'chat/home.html',{
+        "characters":Character.objects.all()
+    })
 
+# about page view
+def about(requests):
+    return render(requests, 'chat/about.html')
+
+# search page view
 def search(request):
     query = request.GET.get('q', '')
     characters = Character.objects.filter().filter(Q(description__icontains=query))
@@ -28,27 +33,7 @@ def search(request):
         'characters': characters,
     })
 
-
-
-
-def home(request):
-    return render(request, 'chat/home.html',{
-        "characters":Character.objects.all()
-    })
-
-# Create your views here.
-
-genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
-
-def about(requests):
-    return render(requests, 'chat/about.html')
-
-
-def home(request):
-    return render(request, 'chat/home.html',{
-        "characters":Character.objects.all()
-    })
-
+# character chat page view
 def chat_with_character(requests, category_slug, character_slug):
     category = get_object_or_404(Category, slug=category_slug)
     character = get_object_or_404(Character, category=category, slug=character_slug)
@@ -70,5 +55,4 @@ def chat_with_character(requests, category_slug, character_slug):
         return JsonResponse({'error': 'Invalid JSON data'}, status=400)
     else:
         return render(requests, 'chat/character_chat.html', {'character': character})
-    
     
