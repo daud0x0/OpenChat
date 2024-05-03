@@ -10,7 +10,6 @@
     <h1 class="my-4">Search result for {{ query }}</h1>
     <div class="row">
       {% for character in characters %}
-        {% if character.category != 'fictional_character' %}
           <div class="col-md-4 mb-4">
             <div class="card h-100">
               <img src="{{ character.image.url }}" class="card-img-top" alt="{{ character.name }}">
@@ -24,7 +23,6 @@
               </div>
             </div>
           </div>
-        {% endif %}
       {% endfor %}
     </div>
     {% else %}
