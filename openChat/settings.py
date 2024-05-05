@@ -28,6 +28,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+CORS_ORIGIN_ALLOW_ALL = True
+
 APPEND_SLASH=False
 
 STATIC_URL = '/static/'
@@ -36,10 +38,17 @@ STATICFILES_DIRS = [
 ]
 
 
+CORS_ORIGIN_WHITELIST = [
+    'http://openchat-xpus.onrender.com',
+    'https://openchat-xpus.onrender.com',
+]
+
+
 # Application definition
 
 INSTALLED_APPS = [
     'chat',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -49,6 +58,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
