@@ -34,7 +34,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 APPEND_SLASH=False
 
-ALLOWED_HOSTS=['openchat-xpus.onrender.com']
+ALLOWED_HOSTS=['openchat-xpus.onrender.com','*']
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
