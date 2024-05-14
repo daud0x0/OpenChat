@@ -28,7 +28,7 @@ CSRF_TRUSTED_ORIGINS = ['https://openchat-xpus.onrender.com']
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 CORS_ORIGIN_ALLOW_ALL = True
 
