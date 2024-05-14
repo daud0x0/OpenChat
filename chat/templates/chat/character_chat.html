@@ -73,13 +73,15 @@ Chat with {{ character.name }}
 </div>
 
 <script type="text/javascript">
-  const url = window.location.href
+  const url = window.location.href;
   const sendBtn = document.getElementById('send-btn');
   const messageInput = document.getElementById('message-input');
   const chatMessages = document.getElementById('chat-messages');
 
-  sendBtn.addEventListener('click', (e) => {
+  // Function to handle sending a message
+  function sendMessage() {
     const message = messageInput.value.trim();
+    if (!message) return;  // Do not send empty messages
 
     // Show loading spinner
     document.getElementById('loading-spinner').style.display = 'inline-block';
@@ -96,35 +98,48 @@ Chat with {{ character.name }}
         'Content-Type': 'application/json',
         'X-CSRFToken': '{{ csrf_token }}'
       },
-      body: JSON.stringify({'message': message})
+      body: JSON.stringify({ 'message': message })
     })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json(); // Assuming response is JSON
-      })
-      .then(data => {
-        // Remove typing indicator
-        chatMessages.removeChild(typingIndicator);
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json(); // Assuming response is JSON
+    })
+    .then(data => {
+      // Remove typing indicator
+      chatMessages.removeChild(typingIndicator);
 
-        const responseMessage = data['message'];
-        const messageElement = document.createElement('div');
-        messageElement.innerHTML = `<strong>You:</strong> ${message}<br><strong>{{ character.name }}:</strong> ${responseMessage}`;
-        chatMessages.appendChild(messageElement);
-        messageInput.value = '';  // Clear input field
-        chatMessages.scrollTop = chatMessages.scrollHeight;  // Scroll to bottom
+      const responseMessage = data['message'];
+      const messageElement = document.createElement('div');
+      messageElement.innerHTML = `<strong>You:</strong> ${message}<br><strong>{{ character.name }}:</strong> ${responseMessage}`;
+      chatMessages.appendChild(messageElement);
+      messageInput.value = '';  // Clear input field
+      chatMessages.scrollTop = chatMessages.scrollHeight;  // Scroll to bottom
 
-        // Hide loading spinner
-        document.getElementById('loading-spinner').style.display = 'none';
-      })
-      .catch(error => {
-        console.error('Error sending data:', error);
+      // Hide loading spinner
+      document.getElementById('loading-spinner').style.display = 'none';
+    })
+    .catch(error => {
+      console.error('Error sending data:', error);
 
-        // Hide loading spinner on error
-        document.getElementById('loading-spinner').style.display = 'none';
-      });
+      // Hide loading spinner on error
+      document.getElementById('loading-spinner').style.display = 'none';
+    });
+  }
+
+  // Event listener for the send button click
+  sendBtn.addEventListener('click', sendMessage);
+
+  // Event listener for the Enter key press
+  messageInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      sendMessage();
+      e.preventDefault();  // Prevent default form submission
+    }
   });
 </script>
+
+
 {% endblock %}
 

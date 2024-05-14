@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+
 from pathlib import Path
 import os
 
@@ -23,12 +24,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-33x^6^oqprs0n3+ntfu%fv(g(l9rvvwc0olj6u@xxo(k3a&dwd'
 
+CSRF_TRUSTED_ORIGINS = ['https://openchat-xpus.onrender.com']
+
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+CORS_ORIGIN_ALLOW_ALL = True
 
 APPEND_SLASH=False
+
+ALLOWED_HOSTS=['openchat-xpus.onrender.com','*']
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
@@ -36,10 +42,17 @@ STATICFILES_DIRS = [
 ]
 
 
+CORS_ORIGIN_WHITELIST = [
+    'http://openchat-xpus.onrender.com',
+    'https://openchat-xpus.onrender.com',
+]
+
+
 # Application definition
 
 INSTALLED_APPS = [
     'chat',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -49,6 +62,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
