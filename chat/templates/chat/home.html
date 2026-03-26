@@ -10,113 +10,126 @@
 
 {% block body %}
 
-<!--For sliders-->
-
-<div id="carouselExampleDark" class="carousel carousel-dark slide" data-bs-ride="carousel">
-  <div class="carousel-indicators">
-    <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-    <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="1" aria-label="Slide 2"></button>
-    <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="2" aria-label="Slide 3"></button>
+<!-- Hero Banner -->
+<section class="hero-section text-center">
+  <div class="container position-relative z-1">
+    <h1 class="display-3 fw-bold mb-4">
+      Welcome to <span class="text-gradient">OpenChat</span>
+    </h1>
+    <p class="lead mb-5 mx-auto text-muted" style="max-width: 600px;">
+      Engage in immersive, intelligent conversations with your favorite fictional characters, brilliant scientists, and inspiring activists, powered by Gemini AI.
+    </p>
+    <a href="#characters-section" class="btn-primary-custom btn-lg text-decoration-none">Start Chatting</a>
   </div>
-  <div class="carousel-inner">
-    <div class="carousel-item active" data-bs-interval="10000">
-      <img src="{% static 'images/ironman.jpg' %}" class="d-block w-100" alt="...">
-      <div class="carousel-caption d-none d-md-block">
-        <h3 class="text-white">Iron Mam</h3>
-        <p class="text-white">Chat with your favorite marvel super hero!</p>
-        <a href="/fictional_character/iron_man/" class="btn btn-primary">Chat</a>
-      </div>
-    </div>
-    <div class="carousel-item" data-bs-interval="2000">
-      <img src="{% static 'images/shifu.jpg' %}" class="d-block w-100" alt="...">
-      <div class="carousel-caption d-none d-md-block">
-        <h3 class="text-white">Master Shifu</h3>
-        <p class="text-white">Chat with your fevorite cartoon character!</p>
-        <a href="/fictional_character/master_shifu/" class="btn btn-primary">Chat</a>
-      </div>
-    </div>
-    <div class="carousel-item">
-      <img src="{% static 'images/einstein.png' %}" class="d-block w-100" alt="...">
-      <div class="carousel-caption d-none d-md-block">
-        <h3 class="text-warning">Albert Einstein</h3>
-        <p class="text-white">Chat with youre fevorite genius scientist!</p>
-        <a href="/scientists/albert_einstein/" class="btn btn-primary">Chat</a>
+</section>
 
-      </div>
-    </div>
+<!-- Main content -->
+<div class="container pb-5" id="characters-section">
+  
+  <!-- Movie Characters -->
+  <h2 class="h3 mb-4 mt-5 d-flex align-items-center gap-2">
+    <span class="fs-4 text-gradient">🎭</span> Fictional Characters
+  </h2>
+  <div class="row g-4">
+    {% for character in characters %}
+      {% if character.category.slug == 'fictional_character' %}
+        <div class="col-sm-6 col-md-4 col-lg-3">
+          <div class="char-card glass-panel">
+            <div class="char-img-wrapper">
+              <img src="{{ character.image.url }}" alt="{{ character.name }}">
+            </div>
+            <div class="char-info">
+              <h4 class="mb-2">{{ character.name }}</h4>
+              <p>{{ character.description }}</p>
+              <div class="mt-auto pt-3 border-top border-secondary border-opacity-25">
+                <a href="{% url 'chat_with_character' category_slug=character.category.slug character_slug=character.slug %}" class="btn-glass w-100 text-center">Chat Now</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
   </div>
-  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Previous</span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden">Next</span>
-  </button>
+
+  <!-- Scientists -->
+  <h2 class="h3 mb-4 mt-5 d-flex align-items-center gap-2">
+    <span class="fs-4 text-gradient">🔬</span> Genius Scientists
+  </h2>
+  <div class="row g-4">
+    {% for character in characters %}
+      {% if character.category.slug == 'scientists' %}
+        <div class="col-sm-6 col-md-4 col-lg-3">
+          <div class="char-card glass-panel">
+            <div class="char-img-wrapper">
+              <img src="{{ character.image.url }}" alt="{{ character.name }}">
+            </div>
+            <div class="char-info">
+              <h4 class="mb-2">{{ character.name }}</h4>
+              <p>{{ character.description }}</p>
+              <div class="mt-auto pt-3 border-top border-secondary border-opacity-25">
+                <a href="{% url 'chat_with_character' category_slug=character.category.slug character_slug=character.slug %}" class="btn-glass w-100 text-center">Chat Now</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <!-- Activists -->
+  <h2 class="h3 mb-4 mt-5 d-flex align-items-center gap-2">
+    <span class="fs-4 text-gradient">📢</span> Inspiring Activists
+  </h2>
+  <div class="row g-4 mb-5">
+    {% for character in characters %}
+      {% if character.category.slug == 'activist' %}
+        <div class="col-sm-6 col-md-4 col-lg-3">
+          <div class="char-card glass-panel">
+            <div class="char-img-wrapper">
+              <img src="{{ character.image.url }}" alt="{{ character.name }}">
+            </div>
+            <div class="char-info">
+              <h4 class="mb-2">{{ character.name }}</h4>
+              <p>{{ character.description }}</p>
+              <div class="mt-auto pt-3 border-top border-secondary border-opacity-25">
+                <a href="{% url 'chat_with_character' category_slug=character.category.slug character_slug=character.slug %}" class="btn-glass w-100 text-center">Chat Now</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <!-- Events Section -->
+  <h2 class="h3 mb-4 mt-5 d-flex align-items-center gap-2">
+    <span class="fs-4 text-gradient">📅</span> Upcoming Events
+  </h2>
+  {% if events %}
+  <div class="row g-4 mb-5">
+    {% for event in events %}
+      <div class="col-md-6 col-lg-4">
+        <div class="char-card glass-panel" style="border-top: 4px solid var(--primary);">
+          {% if event.image %}
+          <div class="char-img-wrapper" style="padding-top: 60%;">
+            <img src="{{ event.image.url }}" alt="{{ event.title }}">
+          </div>
+          {% endif %}
+          <div class="char-info">
+            <h4 class="mb-2 text-primary">{{ event.title }}</h4>
+            <p class="text-sm mb-1"><i class="text-gradient">📍</i> {{ event.location }}</p>
+            <p class="text-sm mb-3"><i class="text-gradient">🕒</i> {{ event.date|date:"F j, Y, g:i a" }}</p>
+            <p>{{ event.description }}</p>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="glass-panel p-4 rounded-4 mb-5 text-center text-muted">
+    <p class="mb-0">No upcoming events right now. Check back later!</p>
+  </div>
+  {% endif %}
+
 </div>
-
-
-  <div class="container">
-    <h1 class="my-4">Chat with your favorite movie character.</h1>
-    <div class="row">
-      {% for character in characters %}
-        {% if character.category.slug == 'fictional_character' %}
-          <div class="col-md-4 mb-4">
-            <div class="card h-100">
-              <img src="{{ character.image.url }}" class="card-img-top" alt="{{ character.name }}">
-              <div class="card-body">
-                <h2 class="card-title">{{ character.name }}</h2>
-                <p class="card-text">{{ character.description }}</p>
-              </div>
-              <div class="card-footer">
-                <a href="{% url 'chat_with_character' category_slug=character.category.slug character_slug=character.slug %}" class="btn btn-primary">Chat</a>
-
-              </div>
-            </div>
-          </div>
-        {% endif %}
-      {% endfor %}
-    </div>
-    <h1 class="my-4">Chat with your favorite scientists.</h1>
-    <div class="row">
-      {% for character in characters %}
-        {% if character.category.slug == 'scientists' %}
-          <div class="col-md-4 mb-4">
-            <div class="card h-100">
-              <img src="{{ character.image.url }}" class="card-img-top" alt="{{ character.name }}">
-              <div class="card-body">
-                <h2 class="card-title">{{ character.name }}</h2>
-                <p class="card-text">{{ character.description }}</p>
-              </div>
-              <div class="card-footer">
-                <a href="{% url 'chat_with_character' category_slug=character.category.slug character_slug=character.slug %}" class="btn btn-primary">Chat</a>
-
-              </div>
-            </div>
-          </div>
-        {% endif %}
-      {% endfor %}
-    </div>
-
-    <h1 class="my-4">Chat with your favorite activists.</h1>
-    <div class="row">
-      {% for character in characters %}
-        {% if character.category.slug == 'activist' %}
-          <div class="col-md-4 mb-4">
-            <div class="card h-100">
-              <img src="{{ character.image.url }}" class="card-img-top" alt="{{ character.name }}">
-              <div class="card-body">
-                <h2 class="card-title">{{ character.name }}</h2>
-                <p class="card-text">{{ character.description }}</p>
-              </div>
-              <div class="card-footer">
-                <a href="{% url 'chat_with_character' category_slug=character.category.slug character_slug=character.slug %}" class="btn btn-primary">Chat</a>
-
-              </div>
-            </div>
-          </div>
-        {% endif %}
-      {% endfor %}
-    </div>
-  </div>
 {% endblock %}
