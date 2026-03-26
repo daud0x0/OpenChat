@@ -13,6 +13,7 @@ import os
 
 genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
 
+
 # home page views
 def home(request):
     return render(request, 'chat/home.html',{
