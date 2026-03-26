@@ -1,130 +1,118 @@
 <!-- chat_with_character.html -->
-
 {% extends 'chat/layout.html' %}
 
 {% block title %}
 Chat with {{ character.name }}
 {% endblock %}
 
-{% block head %}
-<style>
-  /* Add custom styles here */
-  .chat-container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
-
-  .chat-messages {
-    flex-grow: 1;
-    overflow-y: auto;
-    padding: 10px;
-  }
-
-  .typing-indicator {
-    animation: typing-indicator 1s infinite;
-  }
-
-  @keyframes typing-indicator {
-    0% { opacity: 0; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
-  }
-</style>
-{% endblock %}
-
 {% block body %}
-<div class="container">
-  <h1 class="my-4">Chat with {{ character.name }}</h1>
-
-  <div class="row">
-    <div class="col-md-4">
-      <div class="card mb-4">
-        <img src="{{ character.image.url }}" class="card-img-top" alt="{{ character.name }}">
-        <div class="card-body">
-          <h2 class="card-title">{{ character.name }}</h2>
-          <p class="card-text">{{ character.description }}</p>
-        </div>
-      </div>
+<div class="container h-100">
+  <div class="chat-layout">
+    <!-- Character Info Sidebar -->
+    <div class="chat-sidebar justify-content-center justify-content-md-start">
+      <img src="{{ character.image.url }}" alt="{{ character.name }}">
+      <h2 class="h4 mb-2">{{ character.name }}</h2>
+      <p class="text-muted small mb-0">{{ character.description }}</p>
     </div>
 
-    <!-- Chat container -->
-    <div class="col-md-8">
-      <div class="chat-container">
-        <div class="chat-messages" id="chat-messages">
-          <!-- Chat messages will be displayed here -->
-        </div>
-
-        <!-- Input form for sending messages -->
-        <div class="input-group mt-3">
-          <input type="text" class="form-control" placeholder="Type your message..." id="message-input">
-          <div class="input-group-append">
-            <button class="btn btn-primary" type="button" id="send-btn">Send</button>
-          </div>
-        </div>
-
-        <!-- Loading spinner -->
-        <div id="loading-spinner" class="spinner-border text-primary" role="status" style="display: none;">
-          <span class="sr-only">Loading...</span>
+    <!-- Main Chat Window -->
+    <div class="chat-main glass-panel d-flex flex-column h-100 w-100">
+      
+      <!-- Messages Area -->
+      <div class="chat-messages" id="chat-messages">
+        <!-- Initial greeting -->
+        <div class="message ai">
+          Hello! I'm {{ character.name }}. What would you like to talk about today?
         </div>
       </div>
+
+      <!-- Input Area -->
+      <div class="chat-input-area mt-auto">
+        <input type="text" class="chat-input" placeholder="Type your message to {{ character.name }}..." id="message-input" autocomplete="off">
+        <button class="btn-primary-custom px-4" type="button" id="send-btn">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
+      </div>
+
     </div>
   </div>
 </div>
 
 <script type="text/javascript">
-  const url = window.location.href
+  const url = window.location.href;
   const sendBtn = document.getElementById('send-btn');
   const messageInput = document.getElementById('message-input');
   const chatMessages = document.getElementById('chat-messages');
 
-  sendBtn.addEventListener('click', (e) => {
+  function sendMessage() {
     const message = messageInput.value.trim();
+    if (!message) return;
 
-    // Show loading spinner
-    document.getElementById('loading-spinner').style.display = 'inline-block';
+    // Add User Message Bubble
+    appendMessage(message, 'user');
+    messageInput.value = '';
 
-    // Show typing indicator
+    // Show modern typing indicator
+    const typingId = 'typing-' + Date.now();
     const typingIndicator = document.createElement('div');
-    typingIndicator.textContent = '{{ character.name }} is typing...';
-    typingIndicator.classList.add('typing-indicator');
+    typingIndicator.id = typingId;
+    typingIndicator.className = 'typing-dots message ai mt-2';
+    typingIndicator.innerHTML = '<span></span><span></span><span></span>';
     chatMessages.appendChild(typingIndicator);
+    scrollToBottom();
 
+    // Fetch response
     fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRFToken': '{{ csrf_token }}'
       },
-      body: JSON.stringify({'message': message})
+      body: JSON.stringify({ 'message': message })
     })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        return response.json(); // Assuming response is JSON
-      })
-      .then(data => {
-        // Remove typing indicator
-        chatMessages.removeChild(typingIndicator);
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then(data => {
+      // Remove typing indicator
+      const loader = document.getElementById(typingId);
+      if (loader) loader.remove();
 
-        const responseMessage = data['message'];
-        const messageElement = document.createElement('div');
-        messageElement.innerHTML = `<strong>You:</strong> ${message}<br><strong>{{ character.name }}:</strong> ${responseMessage}`;
-        chatMessages.appendChild(messageElement);
-        messageInput.value = '';  // Clear input field
-        chatMessages.scrollTop = chatMessages.scrollHeight;  // Scroll to bottom
+      // Add AI Message Bubble
+      appendMessage(data['message'], 'ai');
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      const loader = document.getElementById(typingId);
+      if (loader) loader.remove();
+      appendMessage("Sorry, I encountered an error connecting to the AI brain.", 'ai text-danger');
+    });
+  }
 
-        // Hide loading spinner
-        document.getElementById('loading-spinner').style.display = 'none';
-      })
-      .catch(error => {
-        console.error('Error sending data:', error);
+  function appendMessage(text, typeClass) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `message ${typeClass} mt-2`;
+    
+    // Convert newlines to br if ai message, basic sanitization
+    msgDiv.innerHTML = text.replace(/\ng/g, '<br>');
+    chatMessages.appendChild(msgDiv);
+    scrollToBottom();
+  }
 
-        // Hide loading spinner on error
-        document.getElementById('loading-spinner').style.display = 'none';
-      });
+  function scrollToBottom() {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  sendBtn.addEventListener('click', sendMessage);
+  messageInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      sendMessage();
+    }
   });
+
 </script>
 {% endblock %}
-

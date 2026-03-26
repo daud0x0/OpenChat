@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.db.models import Q
-from .models import Character, Category
+from .models import Character, Category, Event
 import json
 import google.generativeai as genai
 import os
@@ -16,7 +16,8 @@ genai.configure(api_key=os.environ["GOOGLE_API_KEY"])
 # home page views
 def home(request):
     return render(request, 'chat/home.html',{
-        "characters":Character.objects.all()
+        "characters":Character.objects.all(),
+        "events":Event.objects.all().order_by('-date')
     })
 
 # about page view
@@ -42,7 +43,7 @@ def chat_with_character(requests, category_slug, character_slug):
       try:
         user_chat = requests.body.decode('utf-8')
         user_chat = json.loads(user_chat).get('message', '')
-        model = genai.GenerativeModel('gemini-1.5-pro-latest', system_instruction=character.prompt_instruction)
+        model = genai.GenerativeModel('gemini-3-flash-preview', system_instruction=character.prompt_instruction)
         chat = model.start_chat(history=[])
         response = chat.send_message(user_chat)
         
